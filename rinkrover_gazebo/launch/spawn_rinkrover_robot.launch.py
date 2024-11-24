@@ -23,8 +23,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     # Get the urdf file
-    TURTLEBOT3_MODEL = os.environ['TURTLEBOT3_MODEL']
-    model_folder = 'turtlebot3_' + TURTLEBOT3_MODEL
+    model_folder = 'rinkrover_base_model'
     urdf_path = os.path.join(
         get_package_share_directory('rinkrover_gazebo'),
         'models',
@@ -49,7 +48,7 @@ def generate_launch_description():
         package='gazebo_ros',
         executable='spawn_entity.py',
         arguments=[
-            '-entity', TURTLEBOT3_MODEL,
+            '-entity', 'rinkrover_robot',
             '-file', urdf_path,
             '-x', x_pose,
             '-y', y_pose,
