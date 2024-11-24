@@ -1,0 +1,126 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="rectangle_with_walls">
+    <static>true</static>
+
+    <!-- Base rectangle -->
+    <link name="base">
+      <visual name="base_visual">
+        <geometry>
+          <box>
+            <size>26 61 0.1</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.8 0.8 0.8 1</ambient>
+          <diffuse>0.8 0.8 0.8 1</diffuse>
+          <specular>0.5 0.5 0.5 1</specular>
+        </material>
+      </visual>
+      <collision name="base_collision">
+        <geometry>
+          <box>
+            <size>26 61 0.1</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Wall - North -->
+    <link name="north_wall">
+      <pose>0 30.5 1 0 0 0</pose>
+      <visual name="north_wall_visual">
+        <geometry>
+          <box>
+            <size>26 0.1 2</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.5 0.5 0.5 1</ambient>
+          <diffuse>0.5 0.5 0.5 1</diffuse>
+          <specular>0.3 0.3 0.3 1</specular>
+        </material>
+      </visual>
+      <collision name="north_wall_collision">
+        <geometry>
+          <box>
+            <size>26 0.1 2</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Wall - South -->
+    <link name="south_wall">
+      <pose>0 -30.5 1 0 0 0</pose>
+      <visual name="south_wall_visual">
+        <geometry>
+          <box>
+            <size>26 0.1 2</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.5 0.5 0.5 1</ambient>
+          <diffuse>0.5 0.5 0.5 1</diffuse>
+          <specular>0.3 0.3 0.3 1</specular>
+        </material>
+      </visual>
+      <collision name="south_wall_collision">
+        <geometry>
+          <box>
+            <size>26 0.1 2</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Wall - East -->
+    <link name="east_wall">
+      <pose>12.5 0 1 0 0 0</pose>
+      <visual name="east_wall_visual">
+        <geometry>
+          <box>
+            <size>0.1 61 2</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.5 0.5 0.5 1</ambient>
+          <diffuse>0.5 0.5 0.5 1</diffuse>
+          <specular>0.3 0.3 0.3 1</specular>
+        </material>
+      </visual>
+      <collision name="east_wall_collision">
+        <geometry>
+          <box>
+            <size>0.1 61 2</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Wall - West -->
+    <link name="west_wall">
+      <pose>-12.5 0 1 0 0 0</pose>
+      <visual name="west_wall_visual">
+        <geometry>
+          <box>
+            <size>0.1 61 2</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.5 0.5 0.5 1</ambient>
+          <diffuse>0.5 0.5 0.5 1</diffuse>
+          <specular>0.3 0.3 0.3 1</specular>
+        </material>
+      </visual>
+      <collision name="west_wall_collision">
+        <geometry>
+          <box>
+            <size>0.1 61 2</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+
+  </model>
+</sdf>
