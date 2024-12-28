@@ -22,9 +22,9 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    # Get the urdf file
+    # Get the sdf file
     model_folder = 'rinkrover_base_model'
-    urdf_path = os.path.join(
+    sdf_path = os.path.join(
         get_package_share_directory('rinkrover_gazebo'),
         'models',
         model_folder,
@@ -49,7 +49,7 @@ def generate_launch_description():
         executable='spawn_entity.py',
         arguments=[
             '-entity', 'rinkrover_robot',
-            '-file', urdf_path,
+            '-file', sdf_path,
             '-x', x_pose,
             '-y', y_pose,
             '-z', '0.01'
