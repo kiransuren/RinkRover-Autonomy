@@ -13,3 +13,8 @@ source install/setup.bash
 ```
 ros2 launch rinkrover_gazebo rinkrover_rectangle.launch.py
 ```
+
+3. Teleoperate rinkrover via keyboard
+'''
+ros2 run turtlebot3_teleop teleop_keyboard
+'''
