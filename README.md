@@ -18,3 +18,8 @@ ros2 launch rinkrover_gazebo rinkrover_rectangle.launch.py
 '''
 ros2 run turtlebot3_teleop teleop_keyboard
 '''
+
+4. Start SLAM Online Asynchronous Mapping
+'''
+ros2 launch slam_toolbox online_async_launch.py params_file:=./mapper_params_online_async.yaml use_sim_time:=true
+'''
