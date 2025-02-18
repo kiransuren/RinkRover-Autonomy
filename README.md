@@ -23,3 +23,8 @@ ros2 run turtlebot3_teleop teleop_keyboard
 '''
 ros2 launch slam_toolbox online_async_launch.py params_file:=./mapper_params_online_async.yaml use_sim_time:=true
 '''
+
+5. Run Command Serializer
+'''
+ros2 run command_serializer command_serializer
+'''
