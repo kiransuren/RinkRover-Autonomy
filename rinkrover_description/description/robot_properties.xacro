@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <!-- Define basic properties -->
+    <xacro:property name="wheel_radius" value="0.125"/>
+    <xacro:property name="wheel_width" value="0.09"/>
+    <xacro:property name="chassis_length" value="1.691"/>
+    <xacro:property name="chassis_width" value="0.903"/>
+    <xacro:property name="chassis_height" value="0.955"/>
+    <xacro:property name="wheelbase" value="1.06"/>
+    <xacro:property name="track_width" value="0.748"/>
+</robot>

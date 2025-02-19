@@ -1,0 +1,194 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+    <!---Based off Tricycle Controller and CarlikeBot example-->
+
+    <!--BASE LINK-->
+    <link name="base_link" />
+
+    <!-- CHASSIS LINK-->
+    <link name="chassis">
+        <collision>
+        <origin xyz="${chassis_length/2} 0 ${chassis_height/2}"/>
+        <geometry>
+            <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+        </geometry>
+        </collision>
+
+        <visual>
+            <origin xyz="${(chassis_length/2)-0.45} 0 ${chassis_height/2}"/>
+            <geometry>
+                <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+            </geometry>
+            <material name="grey"/>
+        </visual>
+
+        <!-- <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <mass value="1" />
+        <inertia ixx="0.126164" ixy="0.0" ixz="0.0" iyy="0.416519" iyz="0.0" izz="0.481014" />
+        </inertial> -->
+    </link>
+
+    <joint name="chassis_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="chassis" />
+        <origin xyz="-0.45 0 0"/>
+    </joint>
+
+    <!-- BACK left wheel Link -->
+    <link name="rear_left_wheel">
+        <collision>
+        <geometry>
+            <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+        </collision>
+        <visual>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+        <!-- <inertial>
+        <mass value="2" />
+        <inertia ixx="0.145833" ixy="0.0" ixz="0.0" iyy="0.145833" iyz="0.0" izz="0.125" />
+        </inertial> -->
+    </link>
+    <joint name="rear_left_wheel_joint" type="continuous">
+        <parent link="base_link"/>
+        <child link="rear_left_wheel"/>
+        <origin xyz="0 ${track_width/2} 0" rpy="-${pi/2} 0 0"/>
+        <axis xyz="0 0 1"/>
+        <!-- <dynamics damping="0.2" /> -->
+    </joint>
+
+    <!-- BACK right wheel Link -->
+    <link name="rear_right_wheel">
+        <collision>
+        <geometry>
+            <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+        </collision>
+        <visual>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+    <!-- <inertial>
+      <mass value="2" />
+      <inertia ixx="0.145833" ixy="0.0" ixz="0.0" iyy="0.145833" iyz="0.0" izz="0.125" />
+    </inertial> -->
+    </link>
+    <joint name="rear_right_wheel_joint" type="continuous">
+        <parent link="base_link"/>
+        <child link="rear_right_wheel"/>
+        <origin xyz="0 -${track_width/2} 0" rpy="-${pi/2} 0 0"/>
+        <axis xyz="0 0 1"/>
+        <!-- <dynamics damping="0.2" /> -->
+    </joint>
+
+    <!-- FRONT Steering Link -->
+    <link name="steering_link">
+        <visual>
+        <geometry>
+            <box size="0.01 0.01 0.01" />
+        </geometry>
+        <material name="black" />
+        </visual>
+    </link>
+    <joint name="steering_joint" type="continuous">
+        <origin xyz="${wheelbase} 0 0" rpy="0 0 0" />
+        <parent link="chassis" />
+        <child link="steering_link" />
+        <axis xyz="0 0 1" />
+    </joint>
+
+    <!-- VIRTUAL traction wheel link -->
+    <link name="virtual_traction_link">
+        <visual>
+        <geometry>
+            <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+        <material name="invisible" />
+        </visual>
+        <collision>
+        <geometry>
+            <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+        </collision>
+    </link>
+    <joint name="virtual_traction_joint" type="continuous">
+        <parent link="steering_link"/>
+        <child link="virtual_traction_link" />
+        <origin xyz="0 0 0" rpy="-${pi/2} ${pi/2} 0" />
+        <axis xyz="0 0 1" />
+    </joint>
+
+    <!-- Front Right Wheel-->
+    <link name="front_right_wheel">
+        <collision>
+            <geometry>
+            <cylinder length="${wheel_width}" radius="${wheel_radius}"/>
+            </geometry>
+        </collision>
+        <visual>
+            <geometry>
+            <cylinder length="${wheel_width}" radius="${wheel_radius}"/>
+            </geometry>
+        <material name="black"/>
+        </visual>
+    </link>
+
+    <joint name="front_right_wheel_joint" type="continuous">
+        <parent link="base_link" />
+        <child link="front_right_wheel" />
+        <origin xyz="${wheelbase/2} ${track_width/2} 0" rpy="-${pi/2} ${pi/2} 0"/>
+        <axis xyz="0 0 1"/>
+        <mimic joint="virtual_traction_joint" multiplier="1.0" offset="0.0"/>
+    </joint>
+
+    <!-- Front Left Wheel-->
+    <link name="front_left_wheel">
+        <collision>
+            <geometry>
+            <cylinder length="${wheel_width}" radius="${wheel_radius}"/>
+            </geometry>
+        </collision>
+        <visual>
+            <geometry>
+            <cylinder length="${wheel_width}" radius="${wheel_radius}"/>
+            </geometry>
+        <material name="black"/>
+        </visual>
+    </link>
+
+    <joint name="front_left_wheel_joint" type="continuous">
+        <parent link="base_link" />
+        <child link="front_left_wheel" />
+        <origin xyz="${wheelbase/2} -${track_width/2} 0" rpy="-${pi/2} ${pi/2} 0"/>
+        <axis xyz="0 0 1"/>
+        <mimic joint="virtual_traction_joint" multiplier="1.0" offset="0.0"/>
+    </joint>
+
+  <!-- <ros2_control name="GazeboSystem" type="system">
+    <hardware>
+      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+    </hardware>
+    <joint name="steering_joint">
+      <command_interface name="position" />
+      <state_interface name="position" />
+    </joint>
+    <joint name="traction_joint">
+      <command_interface name="velocity" />
+      <state_interface name="velocity" />
+      <state_interface name="position" />
+    </joint>
+  </ros2_control>
+
+  <gazebo>
+    <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+      <parameters>$(find gazebo_ros2_control_demos)/config/tricycle_drive_controller.yaml</parameters>
+    </plugin>
+  </gazebo> -->
+
+</robot>
