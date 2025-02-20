@@ -4,7 +4,7 @@
     <ros2_control name="GazeboSystem" type="system">
         <hardware>
             <!-- Hardware Interface -->
-            <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
         </hardware>
 
         <joint name="steering_joint">
@@ -27,8 +27,8 @@
     </ros2_control>
 
     <gazebo>
-        <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
-            <parameters>$(find rinkrover_description)/config/tricycle_drive_controller.yaml</parameters>
+        <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+        <parameters>$(find rinkrover_description)/config/tricycle_drive_controller.yaml</parameters>
         </plugin>
     </gazebo>
 </robot>

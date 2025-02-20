@@ -29,44 +29,12 @@ find_package(sensor_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 
 ################################################################################
-# Build
-################################################################################
-link_directories(
-  ${GAZEBO_LIBRARY_DIRS}
-)
-
-include_directories(
-  include
-  ${GAZEBO_INCLUDE_DIRS}
-)
-
-set(dependencies
-  "geometry_msgs"
-  "nav_msgs"
-  "rclcpp"
-  "sensor_msgs"
-  "tf2"
-)
-
-set(EXEC_NAME "rinkrover_drive")
-
-add_executable(${EXEC_NAME} src/rinkrover_drive.cpp)
-ament_target_dependencies(${EXEC_NAME} ${dependencies})
-
-################################################################################
 # Install
 ################################################################################
-install(TARGETS ${EXEC_NAME}
-  DESTINATION lib/${PROJECT_NAME}
-)
-
-install(DIRECTORY launch models rviz urdf worlds
+install(DIRECTORY launch models worlds
   DESTINATION share/${PROJECT_NAME}/
 )
 
-install(DIRECTORY include/
-  DESTINATION include/
-)
 
 ################################################################################
 # Macro for ament package
