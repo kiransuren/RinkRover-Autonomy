@@ -9,7 +9,9 @@
   <maintainer email="kirank.suren@gmail.com">Kiran Surendran</maintainer>
   <license>Apache 2.0</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <depend>gazebo_ros_pkgs</depend>
+  <depend>ros_gz_sim</depend>
+  <exec_depend>ros_ign_gazebo</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
   <depend>geometry_msgs</depend>
   <depend>nav_msgs</depend>
   <depend>rclcpp</depend>

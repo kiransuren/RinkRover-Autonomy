@@ -15,19 +15,16 @@
   <exec_depend>xacro</exec_depend>
 
   <!-- ros2_control -->
-  <exec_depend>ackermann_steering_controller</exec_depend>
   <exec_depend>control_msgs</exec_depend>
-  <exec_depend>diff_drive_controller</exec_depend>
-  <exec_depend>effort_controllers</exec_depend>
-  <exec_depend>gz_ros2_control</exec_depend>
+  <exec_depend>ign_ros2_control</exec_depend>
+  <exec_depend>ros_ign_gazebo</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
   <exec_depend>hardware_interface</exec_depend>
   <exec_depend>imu_sensor_broadcaster</exec_depend>
   <exec_depend>joint_state_broadcaster</exec_depend>
   <exec_depend>joint_trajectory_controller</exec_depend>
-  <exec_depend>mecanum_drive_controller</exec_depend>
   <exec_depend>ros2controlcli</exec_depend>
   <exec_depend>tricycle_controller</exec_depend>
-  <exec_depend>velocity_controllers</exec_depend>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 

@@ -50,7 +50,7 @@ tricycle_controller:
       # max_acceleration: 1000.0
 
     # cmd_vel input
-    cmd_vel_timeout: 500 # In milliseconds. Timeout to stop if no cmd_vel is received
+    cmd_vel_timeout: 10000 # In milliseconds. Timeout to stop if no cmd_vel is received
 
     # Debug
     publish_ackermann_command: true # Publishes AckermannDrive. The speed does not comply to the msg definition, it the wheel angular speed in rad/s.
