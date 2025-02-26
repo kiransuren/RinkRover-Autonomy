@@ -28,3 +28,6 @@ ros2 launch slam_toolbox online_async_launch.py params_file:=./mapper_params_onl
 ```
 ros2 run command_serializer command_serializer
 ```
+
+
+Remember to turn on/off use_sim_time=True/False in tricycle_drive_controller!

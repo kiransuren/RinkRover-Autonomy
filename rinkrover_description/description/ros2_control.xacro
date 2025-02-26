@@ -1,24 +1,19 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <xacro:macro name="rinkrover_ros2_control">
-
-        <ros2_control name="RRSystem" type="system">
-        <hardware>
-            <plugin>rinkrover_hardware/RRSystemHardware</plugin>
-        </hardware>
-
-        <joint name="steering_joint">
-            <command_interface name="position"/>
-            <state_interface name="position"/>
-        </joint>
-        <joint name="virtual_traction_joint">
-            <command_interface name="velocity"/>
-            <state_interface name="velocity"/>
-            <state_interface name="position"/>
-        </joint>
-        </ros2_control>
-
-    </xacro:macro>
+    <ros2_control name="RRSystem" type="system">
+    <hardware>
+        <plugin>rinkrover_hardware/RRSystemHardware</plugin>
+    </hardware>
+    <joint name="steering_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+    </joint>
+    <joint name="virtual_traction_joint">
+        <command_interface name="velocity"/>
+        <state_interface name="velocity"/>
+        <state_interface name="position"/>
+    </joint>
+    </ros2_control>
 
 </robot>

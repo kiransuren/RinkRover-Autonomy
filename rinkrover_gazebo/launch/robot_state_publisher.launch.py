@@ -11,7 +11,7 @@ import xacro
 def generate_launch_description():
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
-    urdf_file_name = 'robot.urdf.xacro'
+    urdf_file_name = 'robot_sim.urdf.xacro'
 
     print('urdf_file_name : {}'.format(urdf_file_name))
 
