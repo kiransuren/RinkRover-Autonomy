@@ -58,6 +58,7 @@ public:
   {
     serial_conn_.FlushIOBuffers(); // Just in case
     serial_conn_.Write(msg_to_send);
+    serial_conn_.Write("\n");
 
     std::string response = "";
     try

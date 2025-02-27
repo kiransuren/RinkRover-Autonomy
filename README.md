@@ -1,9 +1,13 @@
 # RinkRover-Autonomy
 ROS2 Autonomy Stack for RinkRover
 
-## Important Installations
+## Important First-Time Installations
+Install ROS2 Humble:
+https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html
 ```
-sudo apt install libserial-dev 
+sudo rosdep init
+rosdep update
+rosdep install --from-paths . --ignore-src -r -y
 ```
 
 ## Running Gazebo Simulation

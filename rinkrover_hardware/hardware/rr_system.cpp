@@ -295,7 +295,7 @@ hardware_interface::return_type rinkrover_hardware ::RRSystemHardware::write(
 {
   //RCLCPP_INFO(get_logger(), "WRITING!");
 
-  // comms.set_motor_values();
+  comms_.set_motor_values(1, 2);
 
   return hardware_interface::return_type::OK;
 }
