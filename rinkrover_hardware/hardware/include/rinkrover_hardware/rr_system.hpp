@@ -19,6 +19,9 @@
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
 
+#include "rinkrover_hardware/arduino_comms.hpp"
+#include "rinkrover_hardware/wheel.hpp"
+
 namespace rinkrover_hardware
 {
 struct JointValue
@@ -44,6 +47,21 @@ struct Joint
 };
 class RRSystemHardware : public hardware_interface::SystemInterface
 {
+
+struct Config
+{
+  std::string steering_joint_name = "";
+  std::string traction_joint_name = "";
+  std::string device = "";
+  float track_width = 0.0;
+  float wheelbase = 0.0;
+  float loop_rate = 0.0;
+
+  int baud_rate = 0;
+  int timeout_ms = 0;
+  int enc_counts_per_rev = 0;
+};
+
 public:
   RCLCPP_SHARED_PTR_DEFINITIONS(RRSystemHardware);
 
@@ -79,9 +97,10 @@ public:
   rclcpp::Clock::SharedPtr get_clock() const { return clock_; }
 
 private:
-  // Parameters for the CarlikeBot simulation
-  double hw_start_sec_;
-  double hw_stop_sec_;
+  ArduinoComms comms_;
+  Config cfg_;
+  Wheel wheel_l_;
+  Wheel wheel_r_;
 
   // Objects for logging
   std::shared_ptr<rclcpp::Logger> logger_;

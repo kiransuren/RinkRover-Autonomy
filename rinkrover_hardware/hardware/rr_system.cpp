@@ -24,6 +24,22 @@ hardware_interface::CallbackReturn RRSystemHardware::on_init(
   {
     return hardware_interface::CallbackReturn::ERROR;
   }
+
+  // Set interface configuration
+  cfg_.steering_joint_name = info_.hardware_parameters["steering_joint_name"];
+  cfg_.traction_joint_name = info_.hardware_parameters["traction_joint_name"];
+  cfg_.device = info_.hardware_parameters["device"];
+  cfg_.track_width = std::stof(info_.hardware_parameters["track_width"]);
+  cfg_.wheelbase = std::stof(info_.hardware_parameters["wheelbase"]);
+  cfg_.loop_rate = std::stof(info_.hardware_parameters["loop_rate"]);
+  cfg_.baud_rate = std::stoi(info_.hardware_parameters["baud_rate"]);
+  cfg_.timeout_ms = std::stoi(info_.hardware_parameters["timeout_ms"]);
+  cfg_.enc_counts_per_rev = std::stoi(info_.hardware_parameters["enc_counts_per_rev"]);
+
+  wheel_l_.setup("left_wheel", cfg_.enc_counts_per_rev);
+  wheel_r_.setup("right_wheel", cfg_.enc_counts_per_rev);
+
+  // Create logger and clock
   logger_ = std::make_shared<rclcpp::Logger>(
     rclcpp::get_logger("controller_manager.resource_manager.hardware_component.system.RinkRover"));
   clock_ = std::make_shared<rclcpp::Clock>(rclcpp::Clock());
@@ -137,12 +153,6 @@ hardware_interface::CallbackReturn RRSystemHardware::on_init(
     }
   }
 
-  // // BEGIN: This part here is for exemplary purposes - Please do not copy to your production
-  // code
-  hw_start_sec_ = 0.0;
-  hw_stop_sec_ = 3.0;
-  // // END: This part here is for exemplary purposes - Please do not copy to your production code
-
   hw_interfaces_["steering"] = Joint("steering_joint");
 
   hw_interfaces_["traction"] = Joint("virtual_traction_joint");
@@ -214,8 +224,16 @@ RRSystemHardware::export_command_interfaces()
 hardware_interface::CallbackReturn RRSystemHardware::on_activate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
-  //TODO: WAIT for hardware to turn ON
+
   RCLCPP_INFO(get_logger(), "Activating ...please wait...");
+
+  comms_.connect(cfg_.device, cfg_.baud_rate, cfg_.timeout_ms);
+
+  if(!comms_.connected())
+  {
+    RCLCPP_FATAL(get_logger(), "Unable to connect to Serial Device");
+    return hardware_interface::CallbackReturn::ERROR;
+  }
 
   for (auto & joint : hw_interfaces_)
   {
@@ -241,8 +259,14 @@ hardware_interface::CallbackReturn RRSystemHardware::on_activate(
 hardware_interface::CallbackReturn RRSystemHardware::on_deactivate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
-  //TODO: WAIT for hardware to turn OFF
   RCLCPP_INFO(get_logger(), "Deactivating ...please wait...");
+  comms_.disconnect();
+
+  if(comms_.connected())
+  {
+    RCLCPP_FATAL(get_logger(), "Unable to disconnect to Serial Device");
+    return hardware_interface::CallbackReturn::ERROR;
+  }
   RCLCPP_INFO(get_logger(), "Successfully deactivated!");
 
   return hardware_interface::CallbackReturn::SUCCESS;
@@ -253,31 +277,15 @@ hardware_interface::return_type RRSystemHardware::read(
 {
   // TODO: FOR NOW, pass through last command as current state for testing purposes
 
-  RCLCPP_INFO(get_logger(), "READING!");
+  //RCLCPP_INFO(get_logger(), "READING!");
+  //comms_.read_encoder_values();
 
+  // Assume servo motor is highly accurate, pass through feedback as last command
   hw_interfaces_["steering"].state.position = hw_interfaces_["steering"].command.position;
 
   hw_interfaces_["traction"].state.velocity = hw_interfaces_["traction"].command.velocity;
   hw_interfaces_["traction"].state.position +=
     hw_interfaces_["traction"].state.velocity * period.seconds();
-
-  // std::stringstream ss;
-  // ss << "Reading states:";
-
-  // ss << std::fixed << std::setprecision(2) << std::endl
-  //    << "\t"
-  //    << "position: " << hw_interfaces_["steering"].state.position << " for joint '"
-  //    << hw_interfaces_["steering"].joint_name.c_str() << "'" << std::endl
-  //    << "\t"
-  //    << "position: " << hw_interfaces_["traction"].state.position << " for joint '"
-  //    << hw_interfaces_["traction"].joint_name.c_str() << "'" << std::endl
-  //    << "\t"
-  //    << "velocity: " << hw_interfaces_["traction"].state.velocity << " for joint '"
-  //    << hw_interfaces_["traction"].joint_name.c_str() << "'";
-
-  // RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 500, "%s", ss.str().c_str());
-
-  // END: This part here is for exemplary purposes - Please do not copy to your production code
 
   return hardware_interface::return_type::OK;
 }
@@ -285,21 +293,9 @@ hardware_interface::return_type RRSystemHardware::read(
 hardware_interface::return_type rinkrover_hardware ::RRSystemHardware::write(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
-  RCLCPP_INFO(get_logger(), "WRITING!");
-  // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
-  // std::stringstream ss;
-  // ss << "Writing commands:";
+  //RCLCPP_INFO(get_logger(), "WRITING!");
 
-  // ss << std::fixed << std::setprecision(2) << std::endl
-  //    << "\t"
-  //    << "position: " << hw_interfaces_["steering"].command.position << " for joint '"
-  //    << hw_interfaces_["steering"].joint_name.c_str() << "'" << std::endl
-  //    << "\t"
-  //    << "velocity: " << hw_interfaces_["traction"].command.velocity << " for joint '"
-  //    << hw_interfaces_["traction"].joint_name.c_str() << "'";
-
-  // RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 500, "%s", ss.str().c_str());
-  // END: This part here is for exemplary purposes - Please do not copy to your production code
+  // comms.set_motor_values();
 
   return hardware_interface::return_type::OK;
 }

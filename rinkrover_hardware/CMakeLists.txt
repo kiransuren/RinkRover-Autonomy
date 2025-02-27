@@ -39,6 +39,9 @@ ament_target_dependencies(
   ${THIS_PACKAGE_INCLUDE_DEPENDS}
 )
 
+# libserial linking
+target_link_libraries(rinkrover_hardware PUBLIC serial)
+
 # Export hardware plugins
 pluginlib_export_plugin_description_file(hardware_interface rinkrover_hardware.xml)
 
