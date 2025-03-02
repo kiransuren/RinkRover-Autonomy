@@ -58,12 +58,12 @@ public:
   {
     serial_conn_.FlushIOBuffers(); // Just in case
     serial_conn_.Write(msg_to_send);
-    serial_conn_.Write("\n");
+    serial_conn_.Write("\r");
 
     std::string response = "";
     try
     {
-      // Responses end with \r\n so we will read up to (and including) the \n.
+      // Responses end with \r so we will read up to (and including) the \rs.
       serial_conn_.ReadLine(response, '\n', timeout_ms_);
     }
     catch (const LibSerial::ReadTimeout&)
@@ -89,18 +89,23 @@ public:
   {
     std::string response = send_msg("e\r");
 
-    std::string delimiter = " ";
-    size_t del_pos = response.find(delimiter);
-    std::string token_1 = response.substr(0, del_pos);
-    std::string token_2 = response.substr(del_pos + delimiter.length());
+    int enc1, enc2;
 
-    val_1 = std::atoi(token_1.c_str());
-    val_2 = std::atoi(token_2.c_str());
+    int scan_result = sscanf(response.c_str(), "g,%d,%d", &enc1, &enc2);
+
+    if(scan_result < 2)
+    {
+      // error, bad scan
+      std::cerr << "Bad encoder value reading!" << std::endl;
+      return;
+    }
+    val_1 = enc1;
+    val_2 = enc2;
   }
-  void set_motor_values(int val_1, int val_2)
+  void set_motor_values(int left_traction_motor, int right_traction_motor, int steering_motor)
   {
     std::stringstream ss;
-    ss << "m " << val_1 << " " << val_2 << "\r";
+    ss << "m," << left_traction_motor << "," << right_traction_motor << "," << steering_motor << "\r";
     send_msg(ss.str());
   }
 

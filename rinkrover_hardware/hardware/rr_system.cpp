@@ -295,7 +295,25 @@ hardware_interface::return_type rinkrover_hardware ::RRSystemHardware::write(
 {
   //RCLCPP_INFO(get_logger(), "WRITING!");
 
-  comms_.set_motor_values(1, 2);
+  //TODO: Clean this up and move to read from params
+  double track_width =  0.748;
+  double wheelbase = 1.06;
+
+  double req_velocity = hw_interfaces_["traction"].command.velocity;
+  double req_steering_angle = hw_interfaces_["steering"].command.position; // radians
+
+  //TODO: Take virtual center wheel velocity command and transpose to two separate wheel velocity commands
+  double left_motor_vel = req_velocity * (1 - wheelbase*tan(req_steering_angle) / 2*track_width);
+  double right_motor_vel = req_velocity * (1 + wheelbase*tan(req_steering_angle) / 2*track_width);
+
+  //TODO: Convert doubles to x100 integer (0.01 -> 1)
+  int left_motor_cmd = int(round(left_motor_vel*100));
+  int right_motor_cmd = int(round(right_motor_vel*100));
+  int steering_motor_cmd = int(round(req_steering_angle*100)); //as radians!
+
+  //TODO: Add check block to clamp velocity command to something reasonable
+
+  comms_.set_motor_values(left_motor_cmd, right_motor_cmd, steering_motor_cmd);
 
   return hardware_interface::return_type::OK;
 }
