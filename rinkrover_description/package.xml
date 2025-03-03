@@ -12,6 +12,7 @@
   <exec_depend>xacro</exec_depend>
   
   <exec_depend>control_msgs</exec_depend>
+  <exec_depend>ros_gz</exec_depend>
   <exec_depend>ign_ros2_control</exec_depend>
   <exec_depend>rinkrover_hardware</exec_depend>
   <exec_depend>hardware_interface</exec_depend>

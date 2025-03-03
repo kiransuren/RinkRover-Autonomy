@@ -8,6 +8,8 @@ https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html
 sudo rosdep init
 rosdep update
 rosdep install --from-paths . --ignore-src -r -y
+
+sudo apt-get install gz-fortress
 ```
 
 ## Running Gazebo Simulation

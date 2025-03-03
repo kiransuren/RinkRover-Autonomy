@@ -62,22 +62,11 @@ def generate_launch_description():
             ],
     )
 
-    # joint_state_broadcaster_spawner = ExecuteProcess(
-    #     cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-    #          'joint_state_broadcaster'],
-    #     output='screen'
-    # )
-
-    # tricycle_controller_spawner = ExecuteProcess(
-    #     cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-    #          'tricycle_controller'],
-    #     output='screen'
-    # )
     # Bridge
     bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
-        arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
+        arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock', '/scan@sensor_msgs/msg/LaserScan@ignition.msgs.LaserScan'],
         output='screen'
     )
 
