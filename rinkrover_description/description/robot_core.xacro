@@ -7,6 +7,16 @@
     <!--BASE LINK-->
     <link name="base_link" />
 
+    <!--BASE FOOTPRINT LINK-->
+    <joint name="base_footprint_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="base_footprint" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="base_footprint">
+    </link>
+
     <!-- CHASSIS LINK-->
     <link name="chassis">
         <collision>
@@ -257,7 +267,7 @@
     <joint name="lidar_joint" type="fixed">
         <parent link="base_link" />
         <child link="base_scan" />
-        <origin xyz="${wheelbase/2} 0 ${chassis_height + 0.2}" rpy="0 0 0" />
+        <origin xyz="${wheelbase/2} 0 ${chassis_height + wheel_width/2}" rpy="0 0 0" />
     </joint>
 
 </robot>

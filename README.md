@@ -32,9 +32,17 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --param stamped:
 
 ## Running SLAM
 
-Start SLAM Online Asynchronous Mapping
+1. Start SLAM Online Asynchronous Mapping
 ```
-ros2 launch slam_toolbox online_async_launch.py params_file:=./mapper_params_online_async.yaml use_sim_time:=true
+ros2 launch slam_toolbox online_async_launch.py slam_params_file:=./mapping_online_async.yaml use_sim_time:=true
+```
+2. Add map and SlamToolboxPlugin to RVIZ2
+3. Drive around and map data
+4. Use "serialize map" to save map for future use
+
+5. Start SLAM Localization Mode (update yaml file with map file name and start pose)
+```
+ros2 launch slam_toolbox online_async_launch.py slam_params_file:=./localization_online_async.yaml use_sim_time:=true
 ```
 
 ## Running RinkRover Hardware System
@@ -44,4 +52,4 @@ Launch RinkRover Hardware and Control System
 ros2 launch rinkrover_hardware rr.launch.py
 ```
 
-Remember to turn on/off use_sim_time=True/False in tricycle_drive_controller!
+Remember to turn on/off use_sim_time=True/False in tricycle_drive_controller.yaml!

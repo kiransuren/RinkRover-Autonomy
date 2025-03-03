@@ -3,5 +3,5 @@
     <xacro:include filename="robot_properties.xacro"/>
     <xacro:include filename="materials.xacro"/>
     <xacro:include filename="robot_core.xacro"/>
-    <xacro:include filename="ros2_control.xacro"/>
+    <xacro:include filename="ros2_control_sim.xacro"/>
 </robot>
