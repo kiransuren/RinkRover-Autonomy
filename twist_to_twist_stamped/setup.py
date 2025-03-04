@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'command_serializer'
+package_name = 'twist_to_twist_stamped'
 
 setup(
     name=package_name,
@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'command_serializer = command_serializer.command_serializer:main'
+            'twist_to_twist_stamped = twist_to_twist_stamped.twist_to_twist_stamped:main',
         ],
     },
 )

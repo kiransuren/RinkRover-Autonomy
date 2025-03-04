@@ -9,7 +9,12 @@ sudo rosdep init
 rosdep update
 rosdep install --from-paths . --ignore-src -r -y
 
-sudo apt-get install gz-fortress
+sudo apt-get install gz-fortress ros-humble-slam-toolbox ros-humble-navigation2 ros-humble-nav2-bringup ros-humble-twist-mux
+```
+
+Install ROS2 Foxy (for RPI5):
+```
+sudo apt-get install ros-foxy-slam-toolbox ros-foxy-navigation2 ros-foxy-nav2-bringup ros-foxy-twist-mux
 ```
 
 ## Running Gazebo Simulation
@@ -52,4 +57,22 @@ Launch RinkRover Hardware and Control System
 ros2 launch rinkrover_hardware rr.launch.py
 ```
 
+Run twist mux to mux teleop and nav2 commands
+```
+ros2 run twist_mux twist_mux --ros-args --params-file twist_mux.yaml -r cmd_vel_out:=tricycle_controller/cmd_vel
+```
+
 Remember to turn on/off use_sim_time=True/False in tricycle_drive_controller.yaml!
+
+
+
+## Deployment Commands Summary
+```
+ros2 run rviz2 rviz2 --ros-args -p use_sim_time:=true
+
+source install/setup.bash && ros2 launch rinkrover_description online_async_launch.py
+
+source install/setup.bash && ros2 launch rinkrover_gazebo rinkrover_rectangle.launch.py
+
+source install/setup.bash && ros2 launch rinkrover_description navigation_humble.launch.py
+```

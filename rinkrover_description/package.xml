@@ -18,6 +18,8 @@
   <exec_depend>hardware_interface</exec_depend>
   <exec_depend>joint_state_broadcaster</exec_depend>
   <exec_depend>tricycle_controller</exec_depend>
+  <depend>twist_to_twist_stamped</depend>
+
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 

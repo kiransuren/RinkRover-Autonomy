@@ -59,7 +59,11 @@ def generate_launch_description():
             'tricycle_controller',
             '--param-file',
             robot_controllers,
-            ],
+            ]
+    )
+    twist_to_twist_stamped = Node(
+        package='twist_to_twist_stamped',
+        executable='twist_to_twist_stamped'
     )
 
     # Bridge
@@ -80,6 +84,7 @@ def generate_launch_description():
 
     # Add any conditioned actions
     ld.add_action(start_gazebo_ros_spawner_cmd)
+    ld.add_action(twist_to_twist_stamped)
     
     ld.add_action(        RegisterEventHandler(
             event_handler=OnProcessExit(
