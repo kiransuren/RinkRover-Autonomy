@@ -30,7 +30,7 @@ def generate_launch_description():
         [
             FindPackageShare("rinkrover_description"),
             "config",
-            "tricycle_drive_controller.yaml",
+            "deploy_tricycle_drive_controller.yaml",
         ]
     )
 

@@ -12,9 +12,9 @@ rosdep install --from-paths . --ignore-src -r -y
 sudo apt-get install gz-fortress ros-humble-slam-toolbox ros-humble-navigation2 ros-humble-nav2-bringup ros-humble-twist-mux
 ```
 
-Install ROS2 Foxy (for RPI5):
+Install ROS2 jazzy (for RPI5):
 ```
-sudo apt-get install ros-foxy-slam-toolbox ros-foxy-navigation2 ros-foxy-nav2-bringup ros-foxy-twist-mux
+sudo apt-get install ros-jazzy-slam-toolbox ros-jazzy-navigation2 ros-jazzy-nav2-bringup ros-jazzy-twist-mux
 ```
 
 ## Running Gazebo Simulation
@@ -75,4 +75,19 @@ source install/setup.bash && ros2 launch rinkrover_description online_async_laun
 source install/setup.bash && ros2 launch rinkrover_gazebo rinkrover_rectangle.launch.py
 
 source install/setup.bash && ros2 launch rinkrover_description navigation_humble.launch.py
+```
+
+## RPI5 Jazzy Specifc Instructions
+```
+colcon build --packages-ignore rinkrover_gazebo
+
+ros2 run rviz2 rviz2 --ros-args -p use_sim_time:=true
+
+source install/setup.bash && ros2 launch rinkrover_hardware rr.launch.py
+
+source install/setup.bash && ros2 launch rinkrover_hardware online_async_launch.py
+
+source install/setup.bash && ros2 launch rinkrover_hardware navigation.launch.py
+
+
 ```
