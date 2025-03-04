@@ -34,7 +34,7 @@ tricycle_controller:
     # Rate Limiting
     traction: # All values should be positive
       # min_velocity: 0.0
-      # max_velocity: 1000.0
+      max_velocity: 2.0
       # min_acceleration: 0.0
       max_acceleration: 5.0
       # min_deceleration: 0.0
@@ -42,10 +42,10 @@ tricycle_controller:
       # min_jerk: 0.0
       # max_jerk: 1000.0
     steering:
-      min_position: -1.57
-      max_position: 1.57
+      min_position: -0.523599
+      max_position: 0.523599
       # min_velocity: 0.0
-      max_velocity: 1.0
+      max_velocity: 0.2
       # min_acceleration: 0.0
       # max_acceleration: 1000.0
 
