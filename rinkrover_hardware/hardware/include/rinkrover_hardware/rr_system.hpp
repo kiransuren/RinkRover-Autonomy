@@ -113,6 +113,8 @@ private:
   int last_left_motor_cmd = 0;
   int last_right_motor_cmd = 0;
   int last_steering_motor_cmd =0;
+
+  int i2c_file_;
 };
 
 }  // namespace rinkrover_hardware
