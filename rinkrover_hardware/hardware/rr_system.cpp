@@ -235,6 +235,14 @@ hardware_interface::CallbackReturn RRSystemHardware::on_activate(
     return hardware_interface::CallbackReturn::ERROR;
   }
 
+  comms_.activate_controller();
+
+  for (auto i = 0; i < 3; i++)
+  {
+    rclcpp::sleep_for(std::chrono::seconds(1));
+    RCLCPP_INFO(get_logger(), "%.1f seconds left...", 3 - i);
+  }
+
   for (auto & joint : hw_interfaces_)
   {
     joint.second.state.position = 0.0;
@@ -260,6 +268,8 @@ hardware_interface::CallbackReturn RRSystemHardware::on_deactivate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
   RCLCPP_INFO(get_logger(), "Deactivating ...please wait...");
+  comms_.deactivate_controller();
+  
   comms_.disconnect();
 
   if(comms_.connected())
@@ -278,7 +288,11 @@ hardware_interface::return_type RRSystemHardware::read(
   // TODO: FOR NOW, pass through last command as current state for testing purposes
 
   //RCLCPP_INFO(get_logger(), "READING!");
-  //comms_.read_encoder_values();
+  int enc1, enc2;
+
+  // comms_.read_encoder_values(enc1, enc2);
+  // RCLCPP_INFO(
+  //   get_logger(), "Enc1: %d| Enc2: %d", enc1, enc2);
 
   // Assume servo motor is highly accurate, pass through feedback as last command
   hw_interfaces_["steering"].state.position = hw_interfaces_["steering"].command.position;
@@ -309,11 +323,40 @@ hardware_interface::return_type rinkrover_hardware ::RRSystemHardware::write(
   //TODO: Convert doubles to x100 integer (0.01 -> 1)
   int left_motor_cmd = int(round(left_motor_vel*100));
   int right_motor_cmd = int(round(right_motor_vel*100));
-  int steering_motor_cmd = int(round(req_steering_angle*100)); //as radians!
+  int steering_motor_cmd = int(round(req_steering_angle*100*(180/(22/7)))); //as radians!
+  // int left_motor_cmd = 10;
+  // int right_motor_cmd = 10;
+  //int steering_motor_cmd = 0; //as radians!
 
-  //TODO: Add check block to clamp velocity command to something reasonable
+  //RCLCPP_INFO(get_logger(), "(START) L_MOTOR: %d | R_MOTOR: %d | STEER_MOTOR: %d", left_motor_cmd, right_motor_cmd, steering_motor_cmd);
 
-  comms_.set_motor_values(left_motor_cmd, right_motor_cmd, steering_motor_cmd);
+  if(left_motor_cmd > 50)
+  {
+    left_motor_cmd = 50;
+  }
+
+  if(right_motor_cmd > 50)
+  {
+    right_motor_cmd = 50;
+  }
+
+  //RCLCPP_INFO(get_logger(), "(START_START) L_MOTOR: %d | R_MOTOR: %d | STEER_MOTOR: %d", left_motor_cmd, right_motor_cmd, steering_motor_cmd);
+
+
+  if((last_left_motor_cmd == left_motor_cmd && last_right_motor_cmd == right_motor_cmd) && last_steering_motor_cmd == steering_motor_cmd)
+  {
+    return hardware_interface::return_type::OK;
+  }
+
+  RCLCPP_INFO(get_logger(), "(START) L_MOTOR: %d | R_MOTOR: %d | STEER_MOTOR: %d", left_motor_cmd, right_motor_cmd, steering_motor_cmd);
+  comms_.set_motor_values(left_motor_cmd, right_motor_cmd, steering_motor_cmd); // actually sends the serial message
+  RCLCPP_INFO(get_logger(), "DONE: Setting Motor Values");
+
+  last_left_motor_cmd = left_motor_cmd;
+  last_right_motor_cmd = right_motor_cmd;
+  last_steering_motor_cmd = steering_motor_cmd;
+
+  //TODO: Add check block to clamp velocity command to something reasonable SEND AS DEGREES
 
   return hardware_interface::return_type::OK;
 }

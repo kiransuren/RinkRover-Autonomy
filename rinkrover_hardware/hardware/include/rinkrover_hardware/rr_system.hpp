@@ -109,6 +109,10 @@ private:
   // std::vector<std::tuple<std::string, double, double>>
   //   hw_interfaces_;  // name of joint, state, command
   std::map<std::string, Joint> hw_interfaces_;
+
+  int last_left_motor_cmd = 0;
+  int last_right_motor_cmd = 0;
+  int last_steering_motor_cmd =0;
 };
 
 }  // namespace rinkrover_hardware

@@ -54,7 +54,15 @@ public:
   }
 
 
-  std::string send_msg(const std::string &msg_to_send, bool print_output = false)
+  void send_msg(const std::string &msg_to_send, bool print_output = false)
+  {
+    serial_conn_.FlushIOBuffers(); // Just in case
+    serial_conn_.Write(msg_to_send);
+    serial_conn_.Write("\r");
+    return;
+  }
+
+  std::string send_msg_ack(const std::string &msg_to_send, bool print_output = false)
   {
     serial_conn_.FlushIOBuffers(); // Just in case
     serial_conn_.Write(msg_to_send);
@@ -82,14 +90,35 @@ public:
 
   void send_empty_msg()
   {
-    std::string response = send_msg("\r");
+    send_msg("");
   }
 
-  void read_encoder_values(int &val_1, int &val_2)
+  void activate_controller()
   {
-    std::string response = send_msg("e\r");
+    std::string response = send_msg_ack("a");
+    std::cerr << "RESPONSE: " << response.c_str() << std::endl;
+
+    int response_key = 0;
+    int scan_result = sscanf(response.c_str(), "q,%d", &response_key);
+
+    if(scan_result < 1)
+    {
+      // error, bad scan
+      std::cerr << "Bad Activation!" << std::endl;
+    }
+  }
+
+  void deactivate_controller()
+  {
+    send_msg("d\r");
+  }
+
+  bool read_encoder_values(int &val_1, int &val_2)
+  {
+    std::string response = send_msg_ack("e\r");
 
     int enc1, enc2;
+    std::cerr << "RESPONSE: " << response.c_str() << std::endl;
 
     int scan_result = sscanf(response.c_str(), "g,%d,%d", &enc1, &enc2);
 
@@ -97,7 +126,7 @@ public:
     {
       // error, bad scan
       std::cerr << "Bad encoder value reading!" << std::endl;
-      return;
+      return false;
     }
     val_1 = enc1;
     val_2 = enc2;
@@ -105,14 +134,14 @@ public:
   void set_motor_values(int left_traction_motor, int right_traction_motor, int steering_motor)
   {
     std::stringstream ss;
-    ss << "m," << left_traction_motor << "," << right_traction_motor << "," << steering_motor << "\r";
+    ss << "m," << left_traction_motor << "," << right_traction_motor << "," << steering_motor;
     send_msg(ss.str());
   }
 
   void set_pid_values(int k_p, int k_d, int k_i, int k_o)
   {
     std::stringstream ss;
-    ss << "u " << k_p << ":" << k_d << ":" << k_i << ":" << k_o << "\r";
+    ss << "u " << k_p << ":" << k_d << ":" << k_i << ":" << k_o;
     send_msg(ss.str());
   }
 
