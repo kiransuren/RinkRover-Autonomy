@@ -12,6 +12,16 @@
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
+
+#include <iostream>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <linux/i2c-dev.h>
+
+#define I2C_DEVICE "/dev/i2c-1"  // I2C bus on Raspberry Pi 5
+#define ARDUINO_ADDRESS 0x38  // Must match the Arduino's address
+
 namespace rinkrover_hardware
 {
 hardware_interface::CallbackReturn RRSystemHardware::on_init(
@@ -227,21 +237,21 @@ hardware_interface::CallbackReturn RRSystemHardware::on_activate(
 
   RCLCPP_INFO(get_logger(), "Activating ...please wait...");
 
-  comms_.connect(cfg_.device, cfg_.baud_rate, cfg_.timeout_ms);
+  // comms_.connect(cfg_.device, cfg_.baud_rate, cfg_.timeout_ms);
 
-  if(!comms_.connected())
-  {
-    RCLCPP_FATAL(get_logger(), "Unable to connect to Serial Device");
-    return hardware_interface::CallbackReturn::ERROR;
-  }
+  // if(!comms_.connected())
+  // {
+  //   RCLCPP_FATAL(get_logger(), "Unable to connect to Serial Device");
+  //   return hardware_interface::CallbackReturn::ERROR;
+  // }
 
-  comms_.activate_controller();
+  // comms_.activate_controller();
 
-  for (auto i = 0; i < 3; i++)
-  {
-    rclcpp::sleep_for(std::chrono::seconds(1));
-    RCLCPP_INFO(get_logger(), "%.1f seconds left...", 3 - i);
-  }
+  // for (auto i = 0; i < 3; i++)
+  // {
+  //   rclcpp::sleep_for(std::chrono::seconds(1));
+  //   RCLCPP_INFO(get_logger(), "%.1f seconds left...", 3 - i);
+  // }
 
   for (auto & joint : hw_interfaces_)
   {
@@ -268,15 +278,15 @@ hardware_interface::CallbackReturn RRSystemHardware::on_deactivate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
   RCLCPP_INFO(get_logger(), "Deactivating ...please wait...");
-  comms_.deactivate_controller();
+  // comms_.deactivate_controller();
   
-  comms_.disconnect();
+  // comms_.disconnect();
 
-  if(comms_.connected())
-  {
-    RCLCPP_FATAL(get_logger(), "Unable to disconnect to Serial Device");
-    return hardware_interface::CallbackReturn::ERROR;
-  }
+  // if(comms_.connected())
+  // {
+  //   RCLCPP_FATAL(get_logger(), "Unable to disconnect to Serial Device");
+  //   return hardware_interface::CallbackReturn::ERROR;
+  // }
   RCLCPP_INFO(get_logger(), "Successfully deactivated!");
 
   return hardware_interface::CallbackReturn::SUCCESS;
@@ -288,11 +298,29 @@ hardware_interface::return_type RRSystemHardware::read(
   // TODO: FOR NOW, pass through last command as current state for testing purposes
 
   //RCLCPP_INFO(get_logger(), "READING!");
+  int file;
   int enc1, enc2;
 
+  if ((file = open(I2C_DEVICE, O_RDWR)) < 0) {
+    std::cerr << "Failed to open I2C bus" << std::endl;
+  }
+
+  if (ioctl(file, I2C_SLAVE, ARDUINO_ADDRESS) < 0) {
+    std::cerr << "Failed to connect to I2C slave" << std::endl;
+  }
+
+  uint8_t data[4];  // Buffer to hold received bytes
+  if (::read(file, data, 4) != 4) {
+    std::cerr << "I2C Read Error" << std::endl;
+  } else {
+    // Convert received bytes into integer values
+    enc1 = (data[0] << 8) | data[1];  // High byte << 8 + Low byte
+    enc2 = (data[2] << 8) | data[3];
+  }
+
   // comms_.read_encoder_values(enc1, enc2);
-  // RCLCPP_INFO(
-  //   get_logger(), "Enc1: %d| Enc2: %d", enc1, enc2);
+  RCLCPP_INFO(
+    get_logger(), "Enc1: %d| Enc2: %d", enc1, enc2);
 
   // Assume servo motor is highly accurate, pass through feedback as last command
   hw_interfaces_["steering"].state.position = hw_interfaces_["steering"].command.position;
@@ -330,15 +358,15 @@ hardware_interface::return_type rinkrover_hardware ::RRSystemHardware::write(
 
   //RCLCPP_INFO(get_logger(), "(START) L_MOTOR: %d | R_MOTOR: %d | STEER_MOTOR: %d", left_motor_cmd, right_motor_cmd, steering_motor_cmd);
 
-  if(left_motor_cmd > 50)
-  {
-    left_motor_cmd = 50;
-  }
+  // if(left_motor_cmd > 50)
+  // {
+  //   left_motor_cmd = 50;
+  // }
 
-  if(right_motor_cmd > 50)
-  {
-    right_motor_cmd = 50;
-  }
+  // if(right_motor_cmd > 50)
+  // {
+  //   right_motor_cmd = 50;
+  // }
 
   //RCLCPP_INFO(get_logger(), "(START_START) L_MOTOR: %d | R_MOTOR: %d | STEER_MOTOR: %d", left_motor_cmd, right_motor_cmd, steering_motor_cmd);
 
@@ -349,7 +377,7 @@ hardware_interface::return_type rinkrover_hardware ::RRSystemHardware::write(
   }
 
   RCLCPP_INFO(get_logger(), "(START) L_MOTOR: %d | R_MOTOR: %d | STEER_MOTOR: %d", left_motor_cmd, right_motor_cmd, steering_motor_cmd);
-  comms_.set_motor_values(left_motor_cmd, right_motor_cmd, steering_motor_cmd); // actually sends the serial message
+  //comms_.set_motor_values(left_motor_cmd, right_motor_cmd, steering_motor_cmd); // actually sends the serial message
   RCLCPP_INFO(get_logger(), "DONE: Setting Motor Values");
 
   last_left_motor_cmd = left_motor_cmd;

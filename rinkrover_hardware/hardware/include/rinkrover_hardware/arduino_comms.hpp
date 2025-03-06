@@ -115,12 +115,11 @@ public:
 
   bool read_encoder_values(int &val_1, int &val_2)
   {
-    std::string response = send_msg_ack("e\r");
-
-    int enc1, enc2;
+    std::cout << "Sending Message..." << std::endl;
+    std::string response = send_msg_ack("e");
     std::cerr << "RESPONSE: " << response.c_str() << std::endl;
 
-    int scan_result = sscanf(response.c_str(), "g,%d,%d", &enc1, &enc2);
+    int scan_result = sscanf(response.c_str(), "g,%d,%d", &val_1, &val_2);
 
     if(scan_result < 2)
     {
@@ -128,8 +127,6 @@ public:
       std::cerr << "Bad encoder value reading!" << std::endl;
       return false;
     }
-    val_1 = enc1;
-    val_2 = enc2;
   }
   void set_motor_values(int left_traction_motor, int right_traction_motor, int steering_motor)
   {

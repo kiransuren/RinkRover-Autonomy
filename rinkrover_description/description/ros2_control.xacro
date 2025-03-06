@@ -11,7 +11,7 @@
         <param name="wheelbase">1.06</param>
         <param name="loop_rate">30</param>
         <param name="baud_rate">9600</param>
-        <param name="timeout_ms">1000</param>
+        <param name="timeout_ms">3000</param>
         <param name="enc_counts_per_rev">360</param>
     </hardware>
     <joint name="steering_joint">
