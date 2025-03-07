@@ -20,14 +20,14 @@
     <!-- CHASSIS LINK-->
     <link name="chassis">
         <collision>
-        <origin xyz="${(chassis_length/2)-0.45} 0 ${chassis_height/2}"/>
+        <origin xyz="${(chassis_length/2)} 0 ${chassis_height/2}"/>
         <geometry>
             <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
         </geometry>
         </collision>
 
         <visual>
-            <origin xyz="${(chassis_length/2)-0.45} 0 ${chassis_height/2}"/>
+            <origin xyz="${(chassis_length/2)} 0 ${chassis_height/2}"/>
             <geometry>
                 <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
             </geometry>
@@ -35,7 +35,7 @@
         </visual>
 
         <xacro:inertial_box mass="0.05" x="${chassis_length}" y="${chassis_width}" z="${chassis_height}">
-            <origin xyz="${(chassis_length/2)-0.45} 0 ${chassis_height/2}"/>
+            <origin xyz="${(chassis_length/2)} 0 ${chassis_height/2}"/>
         </xacro:inertial_box>
 
     </link>
@@ -43,7 +43,7 @@
     <joint name="chassis_joint" type="fixed">
         <parent link="base_link" />
         <child link="chassis" />
-        <origin xyz="-0.45 0 0"/>
+        <origin xyz="-${wheel_radius+0.45} 0 0"/>
     </joint>
 
     <gazebo reference="chassis">
@@ -120,7 +120,7 @@
     </link>
     <joint name="steering_joint" type="revolute">
         <origin xyz="${wheelbase} 0 0" rpy="0 0 0" />
-        <parent link="chassis" />
+        <parent link="base_link" />
         <child link="steering_link" />
         <axis xyz="0 0 1" />
         <limit effort="5.0" velocity="2.0" lower="-0.78" upper="0.78"/>
@@ -172,7 +172,7 @@
     <joint name="front_right_wheel_joint" type="continuous">
         <parent link="base_link" />
         <child link="front_right_wheel" />
-        <origin xyz="${wheelbase/2} ${track_width/2} 0" rpy="-${pi/2} ${pi/2} 0"/>
+        <origin xyz="${wheelbase} ${track_width/2} 0" rpy="-${pi/2} ${pi/2} 0"/>
         <axis xyz="0 0 1"/>
         <mimic joint="virtual_traction_joint" multiplier="1.0" offset="0.0"/>
     </joint>
@@ -199,7 +199,7 @@
     <joint name="front_left_wheel_joint" type="continuous">
         <parent link="base_link" />
         <child link="front_left_wheel" />
-        <origin xyz="${wheelbase/2} -${track_width/2} 0" rpy="-${pi/2} ${pi/2} 0"/>
+        <origin xyz="${wheelbase} -${track_width/2} 0" rpy="-${pi/2} ${pi/2} 0"/>
         <axis xyz="0 0 1"/>
         <mimic joint="virtual_traction_joint" multiplier="1.0" offset="0.0"/>
     </joint>
@@ -265,7 +265,7 @@
     <joint name="lidar_joint" type="fixed">
         <parent link="base_link" />
         <child link="base_scan" />
-        <origin xyz="${wheelbase/2} 0 ${chassis_height + wheel_width/2}" rpy="0 0 0" />
+        <origin xyz="${wheelbase/2} 0 ${chassis_height + wheel_width/2}" rpy="0 0 -3.14159" />
     </joint>
 
 </robot>

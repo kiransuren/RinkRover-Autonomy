@@ -303,15 +303,27 @@ hardware_interface::return_type RRSystemHardware::read(
     enc2 = (data[2] << 8) | data[3];
   }
 
+  // RCLCPP_INFO(
+  //   get_logger(), "Enc1: %d| Enc2: %d", enc1, enc2);
+
+  double left_motor_feedback = double(enc1)/100.0;
+  double right_motor_feedback = double(enc2)/100.0;
+  double conv_motor_feedback = (left_motor_feedback + right_motor_feedback) /2;
+
   RCLCPP_INFO(
-    get_logger(), "Enc1: %d| Enc2: %d", enc1, enc2);
+    get_logger(), "Enc1: %lf| Enc2: %lf", left_motor_feedback, right_motor_feedback);
 
-  // Assume servo motor is highly accurate, pass through feedback as last command
+  // Using encoder feedback
   hw_interfaces_["steering"].state.position = hw_interfaces_["steering"].command.position;
-
-  hw_interfaces_["traction"].state.velocity = hw_interfaces_["traction"].command.velocity;
+  hw_interfaces_["traction"].state.velocity = conv_motor_feedback;
   hw_interfaces_["traction"].state.position +=
     hw_interfaces_["traction"].state.velocity * period.seconds();
+
+  // // Assume servo motor is highly accurate, pass through feedback as last command
+  // hw_interfaces_["steering"].state.position = hw_interfaces_["steering"].command.position;
+  // hw_interfaces_["traction"].state.velocity = hw_interfaces_["traction"].command.velocity;
+  // hw_interfaces_["traction"].state.position +=
+  //   hw_interfaces_["traction"].state.velocity * period.seconds();
 
   return hardware_interface::return_type::OK;
 }
@@ -327,10 +339,11 @@ hardware_interface::return_type rinkrover_hardware ::RRSystemHardware::write(
 
   double req_velocity = hw_interfaces_["traction"].command.velocity;
   double req_steering_angle = hw_interfaces_["steering"].command.position; // radians
+  double correction = 0.7;
 
   //Take virtual center wheel velocity command and transpose to two separate wheel velocity commands
-  double left_motor_vel = req_velocity * (1 - wheelbase*tan(req_steering_angle) / 2*track_width);
-  double right_motor_vel = req_velocity * (1 + wheelbase*tan(req_steering_angle) / 2*track_width);
+  double left_motor_vel = req_velocity * (1 - wheelbase*tan(req_steering_angle)*correction / 2*track_width);
+  double right_motor_vel = req_velocity * (1 + wheelbase*tan(req_steering_angle)*correction / 2*track_width);
 
   //Convert doubles to x100 integer (0.01 -> 1)
   int left_motor_cmd = int(round(left_motor_vel*100));
