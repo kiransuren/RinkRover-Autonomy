@@ -32,7 +32,7 @@ ros2 launch rinkrover_gazebo rinkrover_rectangle.launch.py
 
 3. Teleoperate rinkrover via keyboard
 ```
-ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --param stamped:=true --remap cmd_vel:=/tricycle_controller/cmd_vel
+ros2 run rr_teleop_twist_keyboard rr_teleop_twist_keyboard
 ```
 
 ## Running SLAM
