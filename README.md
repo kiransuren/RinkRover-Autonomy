@@ -56,12 +56,6 @@ Launch RinkRover Hardware and Control System
 ```
 ros2 launch rinkrover_hardware rr.launch.py
 ```
-
-Run twist mux to mux teleop and nav2 commands
-```
-ros2 run twist_mux twist_mux --ros-args --params-file twist_mux.yaml -r cmd_vel_out:=tricycle_controller/cmd_vel
-```
-
 Remember to turn on/off use_sim_time=True/False in tricycle_drive_controller.yaml!
 
 
@@ -88,6 +82,5 @@ source install/setup.bash && ros2 launch rinkrover_hardware rr.launch.py
 source install/setup.bash && ros2 launch rinkrover_hardware online_async_launch.py
 
 source install/setup.bash && ros2 launch rinkrover_hardware navigation.launch.py
-
 
 ```

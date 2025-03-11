@@ -62,16 +62,9 @@ def generate_launch_description():
         arguments=["tricycle_controller",'--param-file', robot_controllers],
     )
     
-    
-    # add twist_to_twist_stamped
-    twist_to_twist_stamped = Node(
-        package='twist_to_twist_stamped',
-        executable='twist_to_twist_stamped'
-    )
 
     ld = LaunchDescription()
     ld.add_action(control_node)
-    ld.add_action(twist_to_twist_stamped)
     ld.add_action(robot_state_pub_tricycle_node)
     ld.add_action(robot_tricycle_controller_spawner)
     ld.add_action(joint_state_broadcaster_spawner)

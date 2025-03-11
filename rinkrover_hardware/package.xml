@@ -16,7 +16,6 @@
   <depend>rclcpp</depend>
   <depend>rclcpp_lifecycle</depend>
   <depend>libserial-dev</depend>
-  <depend>twist_to_twist_stamped</depend>
 
   <exec_depend>tricycle_controller</exec_depend>
   <exec_depend>controller_manager</exec_depend>
