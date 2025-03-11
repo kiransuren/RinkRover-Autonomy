@@ -289,9 +289,12 @@ hardware_interface::CallbackReturn RRSystemHardware::on_deactivate(
 hardware_interface::return_type RRSystemHardware::read(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & period)
 {
-  // TODO: FOR NOW, pass through last command as current state for testing purposes
-
-  //RCLCPP_INFO(get_logger(), "READING!");
+  //Clean this up and move to read from params
+  double track_width =  0.748;
+  double wheelbase = 1.06;
+  double correction = 0.7;
+    
+  // Buffer to hold encoder feedback [cm/s] -> [m/s] with 2 degrees resolution
   int enc1, enc2;
 
   uint8_t data[4];  // Buffer to hold received bytes
@@ -303,27 +306,28 @@ hardware_interface::return_type RRSystemHardware::read(
     enc2 = (data[2] << 8) | data[3];
   }
 
-  // RCLCPP_INFO(
-  //   get_logger(), "Enc1: %d| Enc2: %d", enc1, enc2);
-
-  double left_motor_feedback = double(enc1)/100.0;
-  double right_motor_feedback = double(enc2)/100.0;
-  double conv_motor_feedback = (left_motor_feedback + right_motor_feedback) /2;
-
+  // Calculate wheel linear velocities [m/s]
+  double left_motor_lin_vel = double(enc1)/100.0;  // [m/s] with 2 degrees resolution
+  double right_motor_lin_vel = double(enc2)/100.0; // [m/s] with 2 degrees resolution
   RCLCPP_INFO(
-    get_logger(), "Enc1: %lf| Enc2: %lf", left_motor_feedback, right_motor_feedback);
+    get_logger(), "Enc1: %lf| Enc2: %lf", left_motor_lin_vel, right_motor_lin_vel);
+  
 
-  // Using encoder feedback
-  hw_interfaces_["steering"].state.position = hw_interfaces_["steering"].command.position;
-  hw_interfaces_["traction"].state.velocity = conv_motor_feedback;
+  // Calculate wheel angular velocities [rad/s]
+  double left_motor_ang_vel = left_motor_lin_vel / 0.127;
+  double right_motor_ang_vel = right_motor_lin_vel / 0.127;
+
+  // Undo ackermann compensation for wheel velocities [rad/s]
+  double virt_left_motor = left_motor_ang_vel / (1 - wheelbase*tan(hw_interfaces_["steering"].command.position)*correction / 2*track_width);
+  double virt_right_motor = right_motor_ang_vel / (1 + wheelbase*tan(hw_interfaces_["steering"].command.position)*correction / 2*track_width);
+  // Take average to find virtual center wheel angular velocities [rad/s]
+  double virtual_motor_angular_vel = (virt_left_motor + virt_right_motor) /2;
+
+  // Set new joint states
+  hw_interfaces_["steering"].state.position = hw_interfaces_["steering"].command.position;  // pass through steering position
+  hw_interfaces_["traction"].state.velocity = virtual_motor_angular_vel;  
   hw_interfaces_["traction"].state.position +=
     hw_interfaces_["traction"].state.velocity * period.seconds();
-
-  // // Assume servo motor is highly accurate, pass through feedback as last command
-  // hw_interfaces_["steering"].state.position = hw_interfaces_["steering"].command.position;
-  // hw_interfaces_["traction"].state.velocity = hw_interfaces_["traction"].command.velocity;
-  // hw_interfaces_["traction"].state.position +=
-  //   hw_interfaces_["traction"].state.velocity * period.seconds();
 
   return hardware_interface::return_type::OK;
 }
@@ -337,7 +341,7 @@ hardware_interface::return_type rinkrover_hardware ::RRSystemHardware::write(
   double track_width =  0.748;
   double wheelbase = 1.06;
 
-  double req_velocity = hw_interfaces_["traction"].command.velocity;
+  double req_velocity = hw_interfaces_["traction"].command.velocity * 0.127; // convert from rad/s to m/s
   double req_steering_angle = hw_interfaces_["steering"].command.position; // radians
   double correction = 0.7;
 
@@ -346,9 +350,9 @@ hardware_interface::return_type rinkrover_hardware ::RRSystemHardware::write(
   double right_motor_vel = req_velocity * (1 + wheelbase*tan(req_steering_angle)*correction / 2*track_width);
 
   //Convert doubles to x100 integer (0.01 -> 1)
-  int left_motor_cmd = int(round(left_motor_vel*100));
-  int right_motor_cmd = int(round(right_motor_vel*100));
-  int steering_motor_cmd = int(round(req_steering_angle*100*(180/(22/7)))); //as radians!
+  int left_motor_cmd = int(round(left_motor_vel*100));                      // send down as cm/s
+  int right_motor_cmd = int(round(right_motor_vel*100));                    // send down as cm/scorrection
+  int steering_motor_cmd = int(round(req_steering_angle*100*(180/(22/7)))); //send down as DEGREES!
 
   RCLCPP_INFO(get_logger(), "(START) L_MOTOR: %d | R_MOTOR: %d | STEER_MOTOR: %d", left_motor_cmd, right_motor_cmd, steering_motor_cmd);
 
