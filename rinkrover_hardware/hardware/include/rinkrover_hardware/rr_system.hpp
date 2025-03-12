@@ -19,7 +19,7 @@
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
 
-#include "rinkrover_hardware/arduino_comms.hpp"
+#include "rinkrover_hardware/i2c_comms.hpp"
 #include "rinkrover_hardware/wheel.hpp"
 
 namespace rinkrover_hardware
@@ -97,7 +97,6 @@ public:
   rclcpp::Clock::SharedPtr get_clock() const { return clock_; }
 
 private:
-  ArduinoComms comms_;
   Config cfg_;
   Wheel wheel_l_;
   Wheel wheel_r_;
@@ -110,11 +109,11 @@ private:
   //   hw_interfaces_;  // name of joint, state, command
   std::map<std::string, Joint> hw_interfaces_;
 
-  int last_left_motor_cmd = 0;
-  int last_right_motor_cmd = 0;
-  int last_steering_motor_cmd =0;
+  int16_t last_left_motor_cmd = 0;
+  int16_t last_right_motor_cmd = 0;
+  int16_t last_steering_motor_cmd =0;
 
-  int i2c_file_;
+  I2CBus bus_;
 };
 
 }  // namespace rinkrover_hardware

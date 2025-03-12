@@ -12,17 +12,6 @@
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
-
-#include <iostream>
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <linux/i2c-dev.h>
-#include <i2c/smbus.h>
-
-#define I2C_DEVICE "/dev/i2c-1"  // I2C bus on Raspberry Pi 5
-#define ARDUINO_ADDRESS 0x08  // Must match the Arduino's address
-
 namespace rinkrover_hardware
 {
 hardware_interface::CallbackReturn RRSystemHardware::on_init(
@@ -238,14 +227,11 @@ hardware_interface::CallbackReturn RRSystemHardware::on_activate(
 
   RCLCPP_INFO(get_logger(), "Activating ...please wait...");
 
-  if ((i2c_file_ = open("/dev/i2c-1" , O_RDWR)) < 0) {
-    std::cerr << "Failed to open I2C bus" << std::endl;
+  // Try to open the i2C bus
+  if (!bus_.openBus()) {
+    std::cerr << "Failed to connect to I2C Bus" << std::endl;
+    return hardware_interface::CallbackReturn::ERROR;
   }
-
-  if (ioctl(i2c_file_, I2C_SLAVE, ARDUINO_ADDRESS) < 0) {
-    std::cerr << "Failed to connect to I2C slave" << std::endl;
-  }
-
 
   for (auto & joint : hw_interfaces_)
   {
@@ -272,15 +258,7 @@ hardware_interface::CallbackReturn RRSystemHardware::on_deactivate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
   RCLCPP_INFO(get_logger(), "Deactivating ...please wait...");
-  // comms_.deactivate_controller();
-  
-  // comms_.disconnect();
 
-  // if(comms_.connected())
-  // {
-  //   RCLCPP_FATAL(get_logger(), "Unable to disconnect to Serial Device");
-  //   return hardware_interface::CallbackReturn::ERROR;
-  // }
   RCLCPP_INFO(get_logger(), "Successfully deactivated!");
 
   return hardware_interface::CallbackReturn::SUCCESS;
@@ -297,13 +275,15 @@ hardware_interface::return_type RRSystemHardware::read(
   // Buffer to hold encoder feedback [cm/s] -> [m/s] with 2 degrees resolution
   int enc1, enc2;
 
-  uint8_t data[4];  // Buffer to hold received bytes
-  if (::read(i2c_file_, data, 4) != 4) {
-    std::cerr << "I2C Read Error" << std::endl;
-  } else {
-    // Convert received bytes into integer values
-    enc1 = (data[0] << 8) | data[1];  // High byte << 8 + Low byte
-    enc2 = (data[2] << 8) | data[3];
+  if(!bus_.readEncoders(enc1, enc2))
+  {
+    RCLCPP_FATAL(get_logger(), "Encoder Reading Failed!");
+  }
+
+  int16_t yaw, pitch, roll;
+  if (bus_.readEulerAngles(yaw, pitch, roll)) {
+    RCLCPP_INFO(
+      get_logger(), "Yaw: %d| Pitch: %d | Roll: %d", yaw, pitch,roll);
   }
 
   // Calculate wheel linear velocities [m/s]
@@ -350,9 +330,9 @@ hardware_interface::return_type rinkrover_hardware ::RRSystemHardware::write(
   double right_motor_vel = req_velocity * (1 + wheelbase*tan(req_steering_angle)*correction / 2*track_width);
 
   //Convert doubles to x100 integer (0.01 -> 1)
-  int left_motor_cmd = int(round(left_motor_vel*100));                      // send down as cm/s
-  int right_motor_cmd = int(round(right_motor_vel*100));                    // send down as cm/scorrection
-  int steering_motor_cmd = int(round(req_steering_angle*100*(180/(22/7)))); //send down as DEGREES!
+  int16_t left_motor_cmd = int16_t(round(left_motor_vel*100));                      // send down as cm/s
+  int16_t right_motor_cmd = int16_t(round(right_motor_vel*100));                    // send down as cm/scorrection
+  int16_t steering_motor_cmd = int16_t(round(req_steering_angle*100*(180/(22/7)))); //send down as DEGREES!
 
   RCLCPP_INFO(get_logger(), "(START) L_MOTOR: %d | R_MOTOR: %d | STEER_MOTOR: %d", left_motor_cmd, right_motor_cmd, steering_motor_cmd);
 
@@ -361,24 +341,11 @@ hardware_interface::return_type rinkrover_hardware ::RRSystemHardware::write(
   {
     return hardware_interface::return_type::OK;
   }
- 
-  // Convert integers to bytes (high and low)
-  uint8_t data[7];  // Data array (6 bytes + command header)
-  data[0] = 0x01; // Command identifier (optional)
-  data[1] = (static_cast<int16_t>(left_motor_cmd) >> 8) & 0xFF;   // Left Motor High Byte
-  data[2] = static_cast<int16_t>(left_motor_cmd) & 0xFF;          // Left Motor Low Byte
-  data[3] = (static_cast<int16_t>(right_motor_cmd) >> 8) & 0xFF;  // Right Motor High Byte
-  data[4] = static_cast<int16_t>(right_motor_cmd) & 0xFF;         // Right Motor Low Byte
-  data[5] = (static_cast<int16_t>(steering_motor_cmd) >> 8) & 0xFF;  // Steering Motor High Byte
-  data[6] = static_cast<int16_t>(steering_motor_cmd) & 0xFF;         // Steering Motor Low Byte
 
-  // Write data to I2C bus
-  if (::write(i2c_file_, data, 7) != 7) {
-      std::cerr << "I2C Write Error" << std::endl;
-  } else {
-      std::cout << "Sent I2C command: L=" << left_motor_cmd 
-                << ", R=" << right_motor_cmd 
-                << ", S=" << steering_motor_cmd << std::endl;
+  if(!bus_.writeMotorCommand(left_motor_cmd, right_motor_cmd, steering_motor_cmd))
+  {
+    RCLCPP_ERROR(get_logger(), "Unable to set motor commands!");
+    //TODO: add fail and return?
   }
 
   RCLCPP_INFO(get_logger(), "DONE: Setting Motor Values");
