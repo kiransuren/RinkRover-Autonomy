@@ -165,6 +165,20 @@ std::vector<hardware_interface::StateInterface> RRSystemHardware::export_state_i
   // Expose state interface variables to the ros2control
   std::vector<hardware_interface::StateInterface> state_interfaces;
 
+  // IMU orientation (quaternion)
+  state_interfaces.emplace_back("imu_sensor", "orientation.w", &orientation_[0]);
+  state_interfaces.emplace_back("imu_sensor", "orientation.x", &orientation_[1]);
+  state_interfaces.emplace_back("imu_sensor", "orientation.y", &orientation_[2]);
+  state_interfaces.emplace_back("imu_sensor", "orientation.z", &orientation_[3]);
+  // IMU angular velocity
+  state_interfaces.emplace_back("imu_sensor", "angular_velocity.x", &angular_velocity_[0]);
+  state_interfaces.emplace_back("imu_sensor", "angular_velocity.y", &angular_velocity_[1]);
+  state_interfaces.emplace_back("imu_sensor", "angular_velocity.z", &angular_velocity_[2]);
+  // IMU linear acceleration
+  state_interfaces.emplace_back("imu_sensor", "linear_acceleration.x", &linear_acceleration_[0]);
+  state_interfaces.emplace_back("imu_sensor", "linear_acceleration.y", &linear_acceleration_[1]);
+  state_interfaces.emplace_back("imu_sensor", "linear_acceleration.z", &linear_acceleration_[2]);
+
   for (auto & joint : hw_interfaces_)
   {
     state_interfaces.emplace_back(hardware_interface::StateInterface(
@@ -280,18 +294,38 @@ hardware_interface::return_type RRSystemHardware::read(
     RCLCPP_FATAL(get_logger(), "Encoder Reading Failed!");
   }
 
-  int16_t yaw, pitch, roll;
-  if (bus_.readEulerAngles(yaw, pitch, roll)) {
-    RCLCPP_INFO(
-      get_logger(), "Yaw: %d| Pitch: %d | Roll: %d", yaw, pitch,roll);
+  int16_t ax, ay, az;
+  if (!bus_.readAccelerometer(ax, ay, az)) {
+    RCLCPP_FATAL(get_logger(), "Accelerometer Reading Failed!");
   }
+
+  int16_t gx, gy, gz;
+  if (!bus_.readGyroscope(gx, gy, gz)) {
+    RCLCPP_FATAL(get_logger(), "Gyroscope Reading Failed!");
+  }
+
+  int16_t qw, qx, qy, qz;
+  if(!bus_.readQuatAngles(qw, qx, qy, qz)) {
+    RCLCPP_FATAL(get_logger(), "Quaternion Orientation Reading Failed!");
+  }
+
+  // Set IMU states after reading
+  orientation_[0] = qw; // w
+  orientation_[1] = qx; // x
+  orientation_[2] = qy; // y
+  orientation_[3] = qz; // z
+
+  angular_velocity_[0] = gx / 100.0;
+  angular_velocity_[1] = gy / 100.0;
+  angular_velocity_[2] = gz / 100.0;
+
+  linear_acceleration_[0] = ax / 100.0;
+  linear_acceleration_[1] = ay / 100.0;
+  linear_acceleration_[2] = az / 100.0;
 
   // Calculate wheel linear velocities [m/s]
   double left_motor_lin_vel = double(enc1)/100.0;  // [m/s] with 2 degrees resolution
   double right_motor_lin_vel = double(enc2)/100.0; // [m/s] with 2 degrees resolution
-  RCLCPP_INFO(
-    get_logger(), "Enc1: %lf| Enc2: %lf", left_motor_lin_vel, right_motor_lin_vel);
-  
 
   // Calculate wheel angular velocities [rad/s]
   double left_motor_ang_vel = left_motor_lin_vel / 0.127;
@@ -315,7 +349,6 @@ hardware_interface::return_type RRSystemHardware::read(
 hardware_interface::return_type rinkrover_hardware ::RRSystemHardware::write(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
-  //RCLCPP_INFO(get_logger(), "WRITING!");
 
   //Clean this up and move to read from params
   double track_width =  0.748;
@@ -334,8 +367,6 @@ hardware_interface::return_type rinkrover_hardware ::RRSystemHardware::write(
   int16_t right_motor_cmd = int16_t(round(right_motor_vel*100));                    // send down as cm/scorrection
   int16_t steering_motor_cmd = int16_t(round(req_steering_angle*100*(180/(22/7)))); //send down as DEGREES!
 
-  RCLCPP_INFO(get_logger(), "(START) L_MOTOR: %d | R_MOTOR: %d | STEER_MOTOR: %d", left_motor_cmd, right_motor_cmd, steering_motor_cmd);
-
   // Don't send any new commands if it is identical to the last command
   if((last_left_motor_cmd == left_motor_cmd && last_right_motor_cmd == right_motor_cmd) && last_steering_motor_cmd == steering_motor_cmd)
   {
@@ -347,8 +378,6 @@ hardware_interface::return_type rinkrover_hardware ::RRSystemHardware::write(
     RCLCPP_ERROR(get_logger(), "Unable to set motor commands!");
     //TODO: add fail and return?
   }
-
-  RCLCPP_INFO(get_logger(), "DONE: Setting Motor Values");
 
   last_left_motor_cmd = left_motor_cmd;
   last_right_motor_cmd = right_motor_cmd;

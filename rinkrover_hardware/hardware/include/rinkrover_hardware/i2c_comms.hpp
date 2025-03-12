@@ -9,7 +9,7 @@
 #define BNO055_ADDRESS 0x29   // BNO055 I2C address
 
 #define BNO055_OPR_MODE 0x3D
-#define BNO055_EULER_START 0x1A  // Euler angles (Yaw, Pitch, Roll)
+#define BNO055_QUAT_START 0x20  // Quaternion (W, X, Y, Z)
 #define BNO055_GYRO_START 0x14   // Gyroscope (X, Y, Z)
 #define BNO055_ACCEL_START 0x08  // Accelerometer (X, Y, Z)
 #define BNO055_NDOF_MODE 0x0C  // Full sensor fusion mode
@@ -87,19 +87,17 @@ public:
         return true;
     }
 
-    bool readEulerAngles(int16_t &yaw, int16_t &pitch, int16_t &roll) {
+    bool readQuatAngles(int16_t &qw, int16_t &qx, int16_t &qy, int16_t &qz) {
         if (!setSlave(BNO055_ADDRESS)) return false;
 
         uint8_t data[6];
-        if (!readData(BNO055_EULER_START, data, 6)) return false;
+        if (!readData(BNO055_QUAT_START, data, 8)) return false;
 
-        yaw = (data[1] << 8) | data[0];
-        pitch = (data[3] << 8) | data[2];
-        roll = (data[5] << 8) | data[4];
-
-        yaw /= 16;
-        pitch /= 16;
-        roll /= 16;
+        // Combine low and high bytes (Little Endian format)
+        qw = (data[1] << 8) | data[0];
+        qx = (data[3] << 8) | data[2];
+        qy = (data[5] << 8) | data[4];
+        qz = (data[7] << 8) | data[6];
 
         return true;
     }
@@ -154,33 +152,3 @@ public:
         return true;
     }
 };
-
-// int main() {
-//     I2CBus bus;
-//     int enc1 = 0, enc2 = 0;
-//     int16_t yaw, pitch, roll;
-//     int16_t ax, ay, az;
-//     int16_t gx, gy, gz;
-
-//     while (true) {
-//         if (bus.readEncoders(enc1, enc2)) {
-//             std::cout << "Encoders: Enc1=" << enc1 << ", Enc2=" << enc2 << std::endl;
-//         }
-
-//         if (bus.readEulerAngles(yaw, pitch, roll)) {
-//             std::cout << "IMU: Yaw=" << yaw << "°, Pitch=" << pitch << "°, Roll=" << roll << "°" << std::endl;
-//         }
-
-//         if (bus.readAccelerometer(ax, ay, az)) {
-//             std::cout << "Accelerometer: Ax=" << ax << ", Ay=" << ay << ", Az=" << az << std::endl;
-//         }
-
-//         if (bus.readGyroscope(gx, gy, gz)) {
-//             std::cout << "Gyroscope: Gx=" << gx << ", Gy=" << gy << ", Gz=" << gz << std::endl;
-//         }
-
-//         sleep(1);
-//     }
-
-//     return 0;
-// }

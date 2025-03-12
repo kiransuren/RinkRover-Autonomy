@@ -55,6 +55,12 @@ def generate_launch_description():
         executable="spawner",
         arguments=["joint_state_broadcaster", '--param-file', robot_controllers],
     )
+    
+    imu_sensor_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["imu_sensor_broadcaster", '--param-file', robot_controllers],
+    )
 
     robot_tricycle_controller_spawner = Node(
         package="controller_manager",
@@ -68,5 +74,6 @@ def generate_launch_description():
     ld.add_action(robot_state_pub_tricycle_node)
     ld.add_action(robot_tricycle_controller_spawner)
     ld.add_action(joint_state_broadcaster_spawner)
+    ld.add_action(imu_sensor_broadcaster_spawner)
 
     return ld

@@ -109,6 +109,10 @@ private:
   //   hw_interfaces_;  // name of joint, state, command
   std::map<std::string, Joint> hw_interfaces_;
 
+  double orientation_[4] = {0.0}; // Quat: w,x,y,z
+  double angular_velocity_[3] = {0.0}; // x, y, z
+  double linear_acceleration_[3] = {0.0}; // x, y, z
+
   int16_t last_left_motor_cmd = 0;
   int16_t last_right_motor_cmd = 0;
   int16_t last_steering_motor_cmd =0;

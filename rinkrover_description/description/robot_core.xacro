@@ -268,4 +268,33 @@
         <origin xyz="${wheelbase/2} 0 ${chassis_height + wheel_width/2}" rpy="0 0 -3.14159" />
     </joint>
 
+
+
+<!--IMU LINK-->
+    <link name="imu_link">
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <visual>
+            <origin xyz="0 0 0"/>
+            <geometry>
+                <box size="0.05 0.05 0.05"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+    </link>
+
+    <gazebo reference="imu_link">
+        <sensor name="imu_sensor" type="imu">
+            <pose relative_to='base_scan'>0 0 0 0 0 0</pose>
+            <parent link="imu_link"/>
+            <topic name="imu_data" />
+            <update_rate>10</update_rate>
+        </sensor>
+    </gazebo>
+
+    <joint name="imu_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="imu_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
 </robot>
