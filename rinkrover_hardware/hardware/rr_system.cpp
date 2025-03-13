@@ -335,11 +335,11 @@ hardware_interface::return_type RRSystemHardware::read(
   double virt_left_motor = left_motor_ang_vel / (1 - wheelbase*tan(hw_interfaces_["steering"].command.position)*correction / 2*track_width);
   double virt_right_motor = right_motor_ang_vel / (1 + wheelbase*tan(hw_interfaces_["steering"].command.position)*correction / 2*track_width);
   // Take average to find virtual center wheel angular velocities [rad/s]
-  double virtual_motor_angular_vel = (virt_left_motor + virt_right_motor) /2;
+  double virtual_traction_motor_vel = (virt_left_motor + virt_right_motor) /2;
 
   // Set new joint states
   hw_interfaces_["steering"].state.position = hw_interfaces_["steering"].command.position;  // pass through steering position
-  hw_interfaces_["traction"].state.velocity = virtual_motor_angular_vel;  
+  hw_interfaces_["traction"].state.velocity = virtual_traction_motor_vel;  
   hw_interfaces_["traction"].state.position +=
     hw_interfaces_["traction"].state.velocity * period.seconds();
 

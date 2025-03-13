@@ -77,6 +77,8 @@ colcon build --packages-ignore rinkrover_gazebo
 
 ros2 run rviz2 rviz2 --ros-args -p use_sim_time:=true
 
+source install/setup.bash && ros2 launch rinkrover_hardware ekf.launch.py
+
 source install/setup.bash && ros2 launch rinkrover_hardware rr.launch.py
 
 source install/setup.bash && ros2 launch rinkrover_hardware online_async_launch.py

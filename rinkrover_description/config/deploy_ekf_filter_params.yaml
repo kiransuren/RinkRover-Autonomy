@@ -1,0 +1,32 @@
+ekf_filter_node:
+  ros__parameters:
+    frequency: 30.0  # Frequency of the filter updates
+    two_d_mode: true  # Use 2D mode if working with ground robots
+    print_diagnostics: true
+  
+    # Whether to broadcast the transformation over the /tf topic. Defaults to true if unspecified.
+    publish_tf: false
+
+    # Frame IDs
+    map_frame: "map"                  # Global frame
+    odom_frame: "odom"                 # Odometry frame
+    base_link_frame: "base_link"        # Robot base frame
+    world_frame: "odom"                 # "odom" if odometry is continuous, "map" if global positioning
+
+    # Input sensor topics
+    odom0: "/tricycle_controller/odom"
+    odom0_config: [true, true, false,  # X, Y, Z (disable Z for 2D)
+                   false, false, true, # Roll, Pitch, Yaw
+                   true, true, false,  # X', Y', Z' velocity
+                   false, false, true, # Roll', Pitch', Yaw' velocity
+                   false, false, false] # Acceleration (if available)
+
+    imu0: "/imu_sensor_broadcaster/imu"
+    imu0_config: [false, false, false, # Position (IMU doesn't provide this)
+                  false, false, false,   # Orientation (roll, pitch, yaw)
+                  false, false, false, # Position velocity
+                  true, true, true,   # Angular velocity
+                  true, true, true] # Acceleration
+
+    imu0_differential: false
+    imu0_remove_gravitational_acceleration: true

@@ -33,6 +33,14 @@ def generate_launch_description():
             "deploy_tricycle_drive_controller.yaml",
         ]
     )
+    
+    ekf_filter_params = PathJoinSubstitution(
+        [
+            FindPackageShare("rinkrover_description"),
+            "config",
+            "deploy_ekf_filter_params.yaml",
+        ]
+    )
 
     control_node = Node(
         package="controller_manager",
@@ -67,6 +75,14 @@ def generate_launch_description():
         executable="spawner",
         arguments=["tricycle_controller",'--param-file', robot_controllers],
     )
+    
+    # localization_spwaner = Node(
+    #         package="robot_localization",
+    #         executable="ekf_localization_node",
+    #         name="ekf_filter_node",
+    #         output="screen",
+    #         parameters=["ekf_filter_params"],
+    # )
     
 
     ld = LaunchDescription()
