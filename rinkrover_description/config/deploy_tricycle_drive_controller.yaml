@@ -53,8 +53,8 @@ tricycle_controller:
       # min_jerk: 0.0
       # max_jerk: 1000.0
     steering:
-      min_position: -0.523599
-      max_position: 0.523599
+      min_position: -0.78 # -44.69 degrees [-45 deg]
+      max_position: 0.78 # +44.69 degrees  [45 deg]
       # min_velocity: 0.0
       max_velocity: 0.2
       # min_acceleration: 0.0
