@@ -48,8 +48,7 @@ def generate_launch_description():
         parameters=[robot_controllers],
         output="both",
         remappings=[
-            ("~/robot_description", "/robot_description"),
-            ("/tricycle_controller/odom", "/odom")
+            ("~/robot_description", "/robot_description")
         ]
     )
     robot_state_pub_tricycle_node = Node(

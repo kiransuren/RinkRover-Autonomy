@@ -213,7 +213,7 @@
     <!--LIDAR LINK-->
     <link name="base_scan">
         <xacro:inertial_cylinder mass="0.01" length="${wheel_width}" radius="${wheel_radius}">
-            <origin xyz="${wheelbase/2} 0 ${chassis_height}" rpy="0 0 0" />
+            <origin xyz="${wheelbase/2} 0 0" rpy="0 0 0" />
         </xacro:inertial_cylinder>
         <visual name="lidar_sensor_visual">
             <geometry>
@@ -265,7 +265,7 @@
     <joint name="lidar_joint" type="fixed">
         <parent link="base_link" />
         <child link="base_scan" />
-        <origin xyz="${wheelbase/2} 0 ${chassis_height + wheel_width/2}" rpy="0 0 -3.14159" />
+        <origin xyz="${wheelbase/2} 0 0.5" rpy="0 0 -3.14159" />
     </joint>
 
 
