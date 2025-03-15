@@ -284,7 +284,7 @@ hardware_interface::return_type RRSystemHardware::read(
   //Clean this up and move to read from params
   double track_width =  0.748;
   double wheelbase = 1.06;
-  double correction = 0.7;
+  double correction = 1.0;
     
   // Buffer to hold encoder feedback [cm/s] -> [m/s] with 2 degrees resolution
   int enc1, enc2;
@@ -339,7 +339,7 @@ hardware_interface::return_type RRSystemHardware::read(
 
   // Set new joint states
   hw_interfaces_["steering"].state.position = hw_interfaces_["steering"].command.position;  // pass through steering position
-  hw_interfaces_["traction"].state.velocity = virtual_traction_motor_vel;  
+  hw_interfaces_["traction"].state.velocity = virtual_traction_motor_vel * 2;  
   hw_interfaces_["traction"].state.position +=
     hw_interfaces_["traction"].state.velocity * period.seconds();
 
@@ -356,7 +356,7 @@ hardware_interface::return_type rinkrover_hardware ::RRSystemHardware::write(
 
   double req_velocity = hw_interfaces_["traction"].command.velocity * 0.127; // convert from rad/s to m/s
   double req_steering_angle = hw_interfaces_["steering"].command.position; // radians
-  double correction = 0.7;
+  double correction = 1.0;
 
   //Take virtual center wheel velocity command and transpose to two separate wheel velocity commands
   double left_motor_vel = req_velocity * (1 - wheelbase*tan(req_steering_angle)*correction / 2*track_width);
