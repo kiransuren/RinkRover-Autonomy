@@ -1,6 +1,34 @@
 # RinkRover-Autonomy
 ROS2 Autonomy Stack for RinkRover
 
+## RPI5 Jazzy Specifc Instructions
+### Mapping Mode
+MAPPING MODE:
+VSCODE Terminal:
+```
+colcon build --packages-ignore rinkrover_gazebo
+```
+
+Open 5 Terminal Tabs:
+```
+[1] 	rviz2
+[2 SSH] source install/setup.bash && ros2 launch rinkrover_hardware rr.launch.py
+[3 SSH] source install/setup.bash && ros2 run rr_teleop_twist_keyboard rr_teleop_twist_keyboard
+[4 SSH] source install/setup.bash && ros2 launch rplidar_ros rplidar_c1_launch.py
+[5 SSH] source install/setup.bash && ros2 launch rinkrover_hardware online_async_launch.py
+[6 SSH] source install/setup.bash && ros2 service call /slam_toolbox/serialize_map slam_toolbox/srv/SerializePoseGraph "{filename: '/home/pi/ros2_ws/RinkRover-Autonomy/MAP_NAME'}"
+```
+### MAKE SURE TO UPDATE THE MAP NAME IN THE YAML FILE! ###
+### LOCALIZATION MODE:
+```
+[1] 	rviz2
+[2 SSH] source install/setup.bash && ros2 launch rinkrover_hardware rr.launch.py
+[3 SSH] source install/setup.bash &&  ros2 run twist_to_twist_stamped twist_to_twist_stamped 
+[4 SSH] source install/setup.bash && ros2 launch rplidar_ros rplidar_c1_launch.py
+[5 SSH] source install/setup.bash && ros2 launch rinkrover_hardware localization_launch.py
+[6 SSH] source install/setup.bash && ros2 launch rinkrover_hardware navigation.launch.py
+```
+
 ## Important First-Time Installations
 Install ROS2 Humble:
 https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html
@@ -32,7 +60,7 @@ ros2 launch rinkrover_gazebo rinkrover_rectangle.launch.py
 
 3. Teleoperate rinkrover via keyboard
 ```
-ros2 run rr_teleop_twist_keyboard rr_teleop_twist_keyboard
+source install/setup.bash && ros2 run rr_teleop_twist_keyboard rr_teleop_twist_keyboard
 ```
 
 ## Running SLAM
@@ -57,32 +85,3 @@ Launch RinkRover Hardware and Control System
 ros2 launch rinkrover_hardware rr.launch.py
 ```
 Remember to turn on/off use_sim_time=True/False in tricycle_drive_controller.yaml!
-
-
-
-## Deployment Commands Summary
-```
-ros2 run rviz2 rviz2 --ros-args -p use_sim_time:=true
-
-source install/setup.bash && ros2 launch rinkrover_description online_async_launch.py
-
-source install/setup.bash && ros2 launch rinkrover_gazebo rinkrover_rectangle.launch.py
-
-source install/setup.bash && ros2 launch rinkrover_description navigation_humble.launch.py
-```
-
-## RPI5 Jazzy Specifc Instructions
-```
-colcon build --packages-ignore rinkrover_gazebo
-
-ros2 run rviz2 rviz2 --ros-args -p use_sim_time:=true
-
-source install/setup.bash && ros2 launch rinkrover_hardware ekf.launch.py
-
-source install/setup.bash && ros2 launch rinkrover_hardware rr.launch.py
-
-source install/setup.bash && ros2 launch rinkrover_hardware online_async_launch.py
-
-source install/setup.bash && ros2 launch rinkrover_hardware navigation.launch.py
-
-```
