@@ -11,7 +11,7 @@
 #define BNO055_OPR_MODE 0x3D
 #define BNO055_QUAT_START 0x20  // Quaternion (W, X, Y, Z)
 #define BNO055_GYRO_START 0x14   // Gyroscope (X, Y, Z)
-#define BNO055_ACCEL_START 0x08  // Accelerometer (X, Y, Z)
+#define BNO055_ACCEL_START 0x28  // Accelerometer (X, Y, Z)
 #define BNO055_NDOF_MODE 0x0C  // Full sensor fusion mode
 
 class I2CBus {

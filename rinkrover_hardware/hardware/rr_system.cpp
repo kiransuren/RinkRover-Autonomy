@@ -310,15 +310,24 @@ hardware_interface::return_type RRSystemHardware::read(
   }
 
   // Set IMU states after reading
-  orientation_[0] = qw; // w
-  orientation_[1] = qx; // x
-  orientation_[2] = qy; // y
-  orientation_[3] = qz; // z
+  // 1 Quat = 2^14 LSB
+  // orientation_[0] = qw / 16384.0 ; // w
+  // orientation_[1] = qx / 16384.0; // x
+  // orientation_[2] = qy / 16384.0; // y
+  // orientation_[3] = qz / 16384.0; // z
+  orientation_[0] = qw / 16384.0; // w
+  orientation_[1] = qx / 16384.0; // x
+  orientation_[2] = qy / 16384.0; // y
+  orientation_[3] = qz / 16384.0; // z
+  // 1DPS = 16LSB
+  angular_velocity_[0] = gx * (1/16.0) * ( (22/7)/180);
+  angular_velocity_[1] = gy * (1/16.0) * ( (22/7)/180);
+  angular_velocity_[2] = gz * (1/16.0) * ( (22/7)/180);
+  // angular_velocity_[0] = gx / 16.0;
+  // angular_velocity_[1] = gy / 16.0;
+  // angular_velocity_[2] = gz / 16.0;
 
-  angular_velocity_[0] = gx / 100.0;
-  angular_velocity_[1] = gy / 100.0;
-  angular_velocity_[2] = gz / 100.0;
-
+  // 1m/s^2 = 100 LSB
   linear_acceleration_[0] = ax / 100.0;
   linear_acceleration_[1] = ay / 100.0;
   linear_acceleration_[2] = az / 100.0;
