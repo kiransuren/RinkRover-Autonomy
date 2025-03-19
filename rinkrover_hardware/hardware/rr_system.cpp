@@ -348,7 +348,7 @@ hardware_interface::return_type RRSystemHardware::read(
 
   // Set new joint states
   hw_interfaces_["steering"].state.position = hw_interfaces_["steering"].command.position;  // pass through steering position
-  hw_interfaces_["traction"].state.velocity = virtual_traction_motor_vel * 2;  
+  hw_interfaces_["traction"].state.velocity = virtual_traction_motor_vel;  
   hw_interfaces_["traction"].state.position +=
     hw_interfaces_["traction"].state.velocity * period.seconds();
 
